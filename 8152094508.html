@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mysterious</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            cursor: none;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            pointer-events: none;
+        }
+
+        .symbol {
+            position: absolute;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .glitch {
+            position: absolute;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+
+        .mouse-trail {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 1000;
+        }
+
+        .eye-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .eye-outer-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .eye-glow {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            left: -25px;
+            top: -25px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            filter: blur(40px);
+        }
+
+        .eye-socket {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 30% 30%, rgba(40, 40, 40, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8),
+                        inset 0 0 15px rgba(255, 255, 255, 0.1),
+                        0 0 50px rgba(255, 255, 255, 0.15),
+                        0 0 100px rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .eye-vein {
+            position: absolute;
+            width: 1px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+            left: 50%;
+            top: 0;
+            transform-origin: top center;
+        }
+
+        .sclera {
+            position: absolute;
+            inset: 15px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 35% 35%, rgba(80, 80, 80, 0.6) 0%, rgba(40, 40, 40, 0.8) 50%, rgba(20, 20, 20, 0.9) 100%);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .iris-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 90px;
+            height: 90px;
+            margin-left: -45px;
+            margin-top: -45px;
+            transition: transform 0.1s ease-out;
+        }
+
+        .iris {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                transparent 30%, 
+                rgba(150, 150, 150, 0.4) 30%, 
+                rgba(120, 120, 120, 0.6) 50%, 
+                rgba(80, 80, 80, 0.8) 80%, 
+                rgba(40, 40, 40, 0.9) 100%
+            );
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3),
+                        inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .iris-line {
+            position: absolute;
+            width: 1px;
+            height: 45px;
+            left: 50%;
+            top: 50%;
+            transform-origin: top center;
+        }
+
+        .iris-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            border: 1px solid;
+        }
+
+        .pupil {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 35px;
+            height: 35px;
+            margin-left: -17.5px;
+            margin-top: -17.5px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(20, 20, 20, 1) 0%, rgba(0, 0, 0, 1) 100%);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .pupil-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: invert(1) brightness(1.5);
+            mix-blend-mode: screen;
+        }
+
+        .highlight {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes particleRise {
+            0% { opacity: 0; transform: translateY(0); }
+            50% { opacity: 0.5; }
+            100% { opacity: 0; transform: translateY(-100px); }
+        }
+
+        @keyframes symbolFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes pupilPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.85); }
+        }
+
+        @keyframes glitchIn {
+            0% { opacity: 0; transform: translateX(-20px); }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; transform: translateX(20px); }
+        }
+
+        @keyframes mouseTrailPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        @keyframes imageFlicker {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- Orbs will be added here -->
+        <!-- Particles will be added here -->
+        <!-- Symbols will be added here -->
+        
+        <!-- Eye -->
+        <div class="eye-container">
+            <!-- Outer rings -->
+            <div class="eye-outer-ring" style="width: 280px; height: 280px; left: -40px; top: -40px; animation: rotate 30s linear infinite;"></div>
+            <div class="eye-outer-ring" style="width: 320px; height: 320px; left: -60px; top: -60px; animation: rotateReverse 40s linear infinite;"></div>
+            <div class="eye-outer-ring" style="width: 360px; height: 360px; left: -80px; top: -80px; animation: rotate 50s linear infinite;"></div>
+            <div class="eye-outer-ring" style="width: 400px; height: 400px; left: -100px; top: -100px; animation: rotateReverse 60s linear infinite;"></div>
+            <div class="eye-outer-ring" style="width: 440px; height: 440px; left: -120px; top: -120px; animation: rotate 70s linear infinite;"></div>
+            
+            <div class="eye-glow" style="animation: pulse 3s ease-in-out infinite;"></div>
+            
+            <div class="eye-socket" style="animation: breathe 4s ease-in-out infinite;">
+                <!-- Veins -->
+                <div class="eye-vein" style="height: 30px; transform: rotate(0deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 35px; transform: rotate(30deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 25px; transform: rotate(60deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 40px; transform: rotate(90deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 28px; transform: rotate(120deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 33px; transform: rotate(150deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 31px; transform: rotate(180deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 26px; transform: rotate(210deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 38px; transform: rotate(240deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 29px; transform: rotate(270deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 34px; transform: rotate(300deg) translateX(-50%);"></div>
+                <div class="eye-vein" style="height: 27px; transform: rotate(330deg) translateX(-50%);"></div>
+                
+                <div class="sclera">
+                    <div class="iris-container" id="irisContainer">
+                        <div class="iris">
+                            <!-- Iris lines (radial patterns) -->
+                            <script>
+                                for (let i = 0; i < 24; i++) {
+                                    const line = document.createElement('div');
+                                    line.className = 'iris-line';
+                                    const brightness = 100 + Math.random() * 100;
+                                    line.style.background = `linear-gradient(to bottom, transparent, rgba(${brightness}, ${brightness}, ${brightness}, 0.3), transparent)`;
+                                    line.style.transform = `rotate(${i * 15}deg) translateX(-50%)`;
+                                    document.currentScript.parentElement.appendChild(line);
+                                }
+                            </script>
+                            
+                            <!-- Iris circles -->
+                            <script>
+                                for (let i = 0; i < 8; i++) {
+                                    const circle = document.createElement('div');
+                                    circle.className = 'iris-circle';
+                                    const size = 20 + i * 8;
+                                    circle.style.width = size + 'px';
+                                    circle.style.height = size + 'px';
+                                    circle.style.marginLeft = -(size / 2) + 'px';
+                                    circle.style.marginTop = -(size / 2) + 'px';
+                                    const color = 150 + i * 10;
+                                    circle.style.borderColor = `rgba(${color}, ${color}, ${color}, ${0.15 - i * 0.01})`;
+                                    circle.style.animation = i % 2 === 0 ? `rotate ${20 + i * 5}s linear infinite` : `rotateReverse ${20 + i * 5}s linear infinite`;
+                                    document.currentScript.parentElement.appendChild(circle);
+                                }
+                            </script>
+                            
+                            <div class="pupil" style="animation: pupilPulse 3s ease-in-out infinite;">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" 
+                                     class="pupil-image" 
+                                     style="animation: imageFlicker 4s ease-in-out infinite;" 
+                                     alt="">
+                            </div>
+                            
+                            <div class="highlight" style="width: 8px; height: 8px; left: 35%; top: 30%;"></div>
+                            <div class="highlight" style="width: 4px; height: 4px; left: 60%; top: 40%; opacity: 0.5;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mouse trail elements -->
+        <div class="mouse-trail" id="mouseTrailLarge" 
+             style="width: 300px; height: 300px; 
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+                    mix-blend-mode: screen;
+                    display: none;
+                    animation: pulse 2s ease-in-out infinite;"></div>
+        <div class="mouse-trail" id="mouseTrailSmall" 
+             style="width: 20px; height: 20px; 
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(200, 200, 200, 0.4) 50%, transparent 70%);
+                    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+                    display: none;
+                    animation: mouseTrailPulse 1.5s ease-in-out infinite;"></div>
+
+        <div class="vignette"></div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const irisContainer = document.getElementById('irisContainer');
+        const mouseTrailLarge = document.getElementById('mouseTrailLarge');
+        const mouseTrailSmall = document.getElementById('mouseTrailSmall');
+
+        // Create orbs
+        const colors = [
+            'rgba(255, 255, 255, 0.1)',
+            'rgba(200, 200, 200, 0.15)',
+            'rgba(150, 150, 150, 0.12)',
+            'rgba(100, 100, 100, 0.1)'
+        ];
+
+        for (let i = 0; i < 12; i++) {
+            const orb = document.createElement('div');
+            orb.className = 'orb';
+            const size = Math.random() * 150 + 50;
+            orb.style.width = size + 'px';
+            orb.style.height = size + 'px';
+            orb.style.left = Math.random() * 100 + '%';
+            orb.style.top = Math.random() * 100 + '%';
+            orb.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            const duration = Math.random() * 20 + 15;
+            orb.style.animation = `float ${duration}s ease-in-out infinite`;
+            orb.style.animationDelay = Math.random() * 5 + 's';
+            
+            // Random movement keyframes
+            const keyframes = `
+                @keyframes float-${i} {
+                    0%, 100% { 
+                        transform: translate(0, 0) scale(1); 
+                        opacity: 0.3; 
+                    }
+                    25% { 
+                        transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) scale(1.2);
+                        opacity: 0.6;
+                    }
+                    50% { 
+                        transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) scale(0.8);
+                        opacity: 0.4;
+                    }
+                    75% { 
+                        transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) scale(1.1);
+                        opacity: 0.5;
+                    }
+                }
+            `;
+            const style = document.createElement('style');
+            style.textContent = keyframes;
+            document.head.appendChild(style);
+            orb.style.animation = `float-${i} ${duration}s ease-in-out infinite`;
+            
+            container.appendChild(orb);
+        }
+
+        // Create particles
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            
+            const duration = Math.random() * 10 + 5;
+            particle.style.animation = `particleRise ${duration}s linear infinite`;
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            
+            container.appendChild(particle);
+        }
+
+        // Create symbols
+        const symbols = ['◇', '◆', '○', '●', '△', '▽', '□', '■', '☆', '★', '◈', '◉'];
+        for (let i = 0; i < 20; i++) {
+            const symbol = document.createElement('div');
+            symbol.className = 'symbol';
+            symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            symbol.style.left = Math.random() * 100 + '%';
+            symbol.style.top = Math.random() * 100 + '%';
+            symbol.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            symbol.style.color = 'rgba(255, 255, 255, 0.15)';
+            
+            const duration = Math.random() * 15 + 10;
+            
+            const keyframes = `
+                @keyframes symbolFloat-${i} {
+                    0%, 100% { 
+                        transform: translateY(0) rotate(0deg); 
+                        opacity: 0.2; 
+                    }
+                    50% { 
+                        transform: translateY(-100px) rotate(360deg); 
+                        opacity: 0.5; 
+                    }
+                }
+            `;
+            const style = document.createElement('style');
+            style.textContent = keyframes;
+            document.head.appendChild(style);
+            symbol.style.animation = `symbolFloat-${i} ${duration}s ease-in-out infinite`;
+            symbol.style.animationDelay = Math.random() * 5 + 's';
+            
+            container.appendChild(symbol);
+        }
+
+        // Glitch effect
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                const glitch = document.createElement('div');
+                glitch.className = 'glitch';
+                glitch.style.left = Math.random() * 100 + '%';
+                glitch.style.top = Math.random() * 100 + '%';
+                glitch.style.width = (Math.random() * 200 + 50) + 'px';
+                glitch.style.height = (Math.random() * 5 + 1) + 'px';
+                glitch.style.background = 'rgba(255, 255, 255, 0.3)';
+                glitch.style.animation = 'glitchIn 0.2s ease-out';
+                
+                container.appendChild(glitch);
+                
+                setTimeout(() => {
+                    glitch.remove();
+                }, 200);
+            }
+        }, 1000);
+
+        // Mouse tracking for eye and trail
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Update mouse trail
+            mouseTrailLarge.style.display = 'block';
+            mouseTrailSmall.style.display = 'block';
+            mouseTrailLarge.style.left = (mouseX - 150) + 'px';
+            mouseTrailLarge.style.top = (mouseY - 150) + 'px';
+            mouseTrailSmall.style.left = (mouseX - 10) + 'px';
+            mouseTrailSmall.style.top = (mouseY - 10) + 'px';
+            
+            // Update iris position
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const deltaX = mouseX - centerX;
+            const deltaY = mouseY - centerY;
+            
+            const angle = Math.atan2(deltaY, deltaX);
+            const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY) / 20, 15);
+            
+            const pupilX = Math.cos(angle) * distance;
+            const pupilY = Math.sin(angle) * distance;
+            
+            irisContainer.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+        });
+    </script>
+</body>
+</html>

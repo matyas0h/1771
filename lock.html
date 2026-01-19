@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1771</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main>
+        <img class="lock" src="lock.png" alt="lock">
+        <input
+            class="code-input"
+            type="text"
+            maxlength="6"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+        />
+    </main>
+
+    <script>
+        const input = document.querySelector('.code-input');
+
+        input.addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+
+            if (e.target.value === '458732') {
+                window.location.href = '/8152094508';
+            }
+        });
+    </script>
+</body>
+</html>
