@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Order of Eight Keys</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Background effects */
+        .bg-gradient {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, #0a0a0a 0%, #000 50%, #000 100%);
+            opacity: 0.8;
+        }
+
+        .grain-texture {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            animation: grain-pulse 3s ease-in-out infinite;
+        }
+
+        .vignette {
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 200px 100px rgba(0, 0, 0, 0.9);
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Title section */
+        .title-section {
+            margin-bottom: 80px;
+            text-align: center;
+            opacity: 0;
+            animation: fade-in-down 1.5s ease-out 0.3s forwards;
+        }
+
+        .subtitle {
+            color: #a1a1a1;
+            letter-spacing: 0.3em;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+
+        .main-title {
+            color: #e5e5e5;
+            letter-spacing: 0.5em;
+            font-size: 24px;
+            text-transform: uppercase;
+            font-weight: 200;
+        }
+
+        .title-divider {
+            height: 1px;
+            width: 128px;
+            background: linear-gradient(to right, transparent, #52525b, transparent);
+            margin: 16px auto 0;
+        }
+
+        /* Keys container */
+        .keys-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 4/3;
+        }
+
+        .mystical-circle {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            border: 1px solid rgba(39, 39, 42, 0.3);
+            opacity: 0.1;
+            animation: circle-pulse 8s ease-in-out infinite;
+        }
+
+        /* Key styles */
+        .key {
+            position: absolute;
+            cursor: pointer;
+            opacity: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .key:hover {
+            transform: scale(1.1) !important;
+        }
+
+        .key.collected .key-icon {
+            filter: grayscale(0%) brightness(1.2) contrast(1.1);
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        .key:not(.collected) .key-icon {
+            filter: grayscale(100%) brightness(0.4) contrast(0.8) blur(0.5px);
+        }
+
+        .key-icon {
+            transition: filter 0.3s ease;
+        }
+
+        .key-label {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -32px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .key:hover .key-label {
+            opacity: 1;
+        }
+
+        .key-name {
+            font-size: 12px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        .key.collected .key-name {
+            color: #22d3ee;
+            font-weight: 500;
+        }
+
+        .key:not(.collected) .key-name {
+            color: #52525b;
+            font-weight: 300;
+        }
+
+        .key-status {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .key.collected .key-status {
+            color: rgba(34, 211, 238, 0.6);
+        }
+
+        .key:not(.collected) .key-status {
+            color: #3f3f46;
+        }
+
+        .key-glow {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 220, 240, 0.2) 0%, transparent 70%);
+            animation: glow-expand 2.5s ease-in-out infinite;
+        }
+
+        /* Bottom text */
+        .bottom-text {
+            margin-top: 80px;
+            text-align: center;
+            opacity: 0;
+            animation: fade-in 2s ease-out 2s forwards;
+        }
+
+        .collected-count {
+            color: #52525b;
+            font-size: 12px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        .seek-text {
+            color: #3f3f46;
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            margin-top: 8px;
+            text-transform: uppercase;
+            font-weight: 200;
+            animation: text-pulse 4s ease-in-out infinite;
+        }
+
+        /* Corner symbols */
+        .corner-symbol {
+            position: absolute;
+            color: #27272a;
+            font-size: 24px;
+            font-weight: 300;
+            opacity: 0.2;
+        }
+
+        .corner-symbol.top-left { top: 32px; left: 32px; }
+        .corner-symbol.top-right { top: 32px; right: 32px; }
+        .corner-symbol.bottom-left { bottom: 32px; left: 32px; }
+        .corner-symbol.bottom-right { bottom: 32px; right: 32px; }
+
+        /* Animations */
+        @keyframes fade-in-down {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes grain-pulse {
+            0%, 100% { opacity: 0.03; }
+            50% { opacity: 0.05; }
+        }
+
+        @keyframes circle-pulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.1;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 0.2;
+            }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                filter: grayscale(0%) brightness(1.2) contrast(1.1) drop-shadow(0 0 10px rgba(100, 220, 240, 0.6));
+            }
+            50% {
+                filter: grayscale(0%) brightness(1.2) contrast(1.1) drop-shadow(0 0 20px rgba(100, 220, 240, 0.8));
+            }
+        }
+
+        @keyframes glow-expand {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes text-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes key-appear {
+            from {
+                opacity: 0;
+                transform: scale(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 18px;
+            }
+            .keys-container {
+                max-width: 100%;
+            }
+            .mystical-circle {
+                width: 400px;
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background effects -->
+        <div class="bg-gradient"></div>
+        <div class="grain-texture"></div>
+        <div class="vignette"></div>
+
+        <div class="content">
+            <!-- Title -->
+            <div class="title-section">
+                <h1 class="subtitle">The Order of</h1>
+                <h2 class="main-title">Eight Keys</h2>
+                <div class="title-divider"></div>
+            </div>
+
+            <!-- Keys container -->
+            <div class="keys-container">
+                <!-- Mystical circle background -->
+                <div class="mystical-circle"></div>
+
+                <!-- Keys will be inserted here by JavaScript -->
+                <div id="keys"></div>
+            </div>
+
+            <!-- Bottom text -->
+            <div class="bottom-text">
+                <p class="collected-count">1 of 8 Collected</p>
+                <p class="seek-text">Seek the others...</p>
+            </div>
+        </div>
+
+        <!-- Corner symbols -->
+        <div class="corner-symbol top-left">◈</div>
+        <div class="corner-symbol top-right">◈</div>
+        <div class="corner-symbol bottom-left">◈</div>
+        <div class="corner-symbol bottom-right">◈</div>
+    </div>
+
+    <script>
+        const keys = [
+            { id: 1, name: "Wisdom", position: { x: 20, y: 15 }, collected: false, rotation: -5 },
+            { id: 2, name: "Truth", position: { x: 45, y: 8 }, collected: true, rotation: 8 },
+            { id: 3, name: "Power", position: { x: 70, y: 18 }, collected: false, rotation: -3 },
+            { id: 4, name: "Mystery", position: { x: 12, y: 38 }, collected: false, rotation: 12 },
+            { id: 5, name: "Eternity", position: { x: 75, y: 42 }, collected: false, rotation: -8 },
+            { id: 6, name: "Void", position: { x: 28, y: 58 }, collected: false, rotation: 5 },
+            { id: 7, name: "Blood", position: { x: 48, y: 65 }, collected: false, rotation: -10 },
+            { id: 8, name: "Chaos", position: { x: 68, y: 55 }, collected: false, rotation: 7 },
+        ];
+
+        const keysContainer = document.getElementById('keys');
+
+        keys.forEach((key, index) => {
+            const keyElement = document.createElement('div');
+            keyElement.className = `key ${key.collected ? 'collected' : ''}`;
+            keyElement.style.left = `${key.position.x}%`;
+            keyElement.style.top = `${key.position.y}%`;
+            keyElement.style.transform = `rotate(${key.rotation}deg)`;
+            keyElement.style.animation = `key-appear 0.8s ease-out ${index * 0.2}s forwards`;
+
+            // Create floating animation
+            const floatDuration = 3 + index * 0.3;
+            const floatDelay = index * 0.5;
+            keyElement.style.animationName = `key-appear, float-${index}`;
+            keyElement.style.animationDuration = `0.8s, ${floatDuration}s`;
+            keyElement.style.animationDelay = `${index * 0.2}s, ${floatDelay}s`;
+            keyElement.style.animationIterationCount = '1, infinite';
+            keyElement.style.animationTimingFunction = 'ease-out, ease-in-out';
+            keyElement.style.animationFillMode = 'forwards, none';
+
+            // Create unique floating animation for each key
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                @keyframes float-${index} {
+                    0%, 100% { transform: rotate(${key.rotation}deg) translateY(0); }
+                    50% { transform: rotate(${key.rotation}deg) translateY(-10px); }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            const color = key.collected ? '#64dcf0' : '#444';
+            const strokeColor = key.collected ? '#000' : '#222';
+
+            keyElement.innerHTML = `
+                <div class="key-icon">
+                    <svg width="60" height="60" viewBox="0 0 60 60">
+                        <circle cx="20" cy="20" r="12" fill="none" stroke="${color}" stroke-width="4"/>
+                        <circle cx="20" cy="20" r="6" fill="none" stroke="${color}" stroke-width="3"/>
+                        <rect x="30" y="17" width="20" height="6" fill="${color}" stroke="${strokeColor}" stroke-width="2"/>
+                        <rect x="42" y="23" width="3" height="6" fill="${color}" stroke="${strokeColor}" stroke-width="1"/>
+                        <rect x="47" y="23" width="3" height="8" fill="${color}" stroke="${strokeColor}" stroke-width="1"/>
+                    </svg>
+                </div>
+                <div class="key-label">
+                    <div class="key-name">${key.name}</div>
+                    <div class="key-status">${key.collected ? 'ACQUIRED' : 'LOCKED'}</div>
+                </div>
+                ${key.collected ? '<div class="key-glow"></div>' : ''}
+            `;
+
+            keysContainer.appendChild(keyElement);
+        });
+    </script>
+</body>
+</html>
