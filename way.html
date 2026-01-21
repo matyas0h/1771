@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>INITIATION</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    color: #eee;
+    font-family: "Courier New", monospace;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#temple {
+    width: 420px;
+    text-align: center;
+}
+
+h1 {
+    font-weight: normal;
+    letter-spacing: 6px;
+    opacity: 0.9;
+}
+
+#stage {
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+#hint {
+    margin-top: 12px;
+    font-size: 11px;
+    opacity: 0.25;
+}
+
+input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #555;
+    color: #fff;
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    padding: 6px;
+    outline: none;
+}
+
+.flicker {
+    animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+    0% { opacity: 1 }
+    50% { opacity: 0.4 }
+    100% { opacity: 1 }
+}
+
+.fade {
+    animation: fade 1s forwards;
+}
+
+@keyframes fade {
+    from { opacity: 0 }
+    to { opacity: 1 }
+}
+</style>
+</head>
+
+<body>
+<div id="temple">
+    <h1>☩ INITIATION ☩</h1>
+    <div id="stage"></div>
+    <input id="answer" autocomplete="off" spellcheck="false">
+    <div id="hint"></div>
+</div>
+
+<script>
+const stages = [
+{
+ q: "WRITE THE FIRST WORD EVER SPOKEN.",
+ a: "the first word ever spoken.",
+ h: "think outside the box"
+},
+{
+ q: "WHAT REMAINS WHEN EVERYTHING IS REMOVED?",
+ a: "nothing",
+ h: "null"
+},
+{
+ q: "COUNT THE LETTERS IN THIS SENTENCE.",
+ a: "31",
+ h: "spaces count"
+},
+{
+ q: "01001000 01000101 01001100 01001100 01001111",
+ a: "hello",
+ h: "binary"
+},
+{
+ q: "REVERSE THE NAME OF THE PLACE YOU STAND IN.",
+ a: "darkness",
+ h: "look above"
+},
+{
+ q: "Ⅲ × Ⅶ",
+ a: "21",
+ h: "rome"
+},
+{
+ q: "THE ANSWER IS HIDDEN.",
+ a: "veil",
+ h: "inspect"
+},
+{
+ q: "WHAT NUMBER NEVER CHANGES?",
+ a: "0",
+ h: "least"
+},
+{
+ q: "WHAT HAS KEYS BUT NO LOCKS?",
+ a: "keyboard",
+ h: "qwertzuiopasdfghjklyxcvbnm"
+},
+{
+ q: "3/9/2022 ETTB",
+ a: "dark protogen, protogen, buck, shade",
+ h: "list them all (4)"
+},
+{
+ q: "WHAT WORD BECOMES SHORTER WHEN YOU ADD TWO LETTERS?",
+ a: "short",
+ h: "paradox"
+},
+{
+ q: "BASE64: ZGV2b3Rpb24=",
+ a: "devotion",
+ h: "encode"
+},
+{
+ q: "WHAT IS SEEN ONLY WHEN YOU STOP LOOKING?",
+ a: "truth",
+ h: "faith"
+},
+{
+ q: "THE NUMBER OF STAGES YOU HAVE PASSED.",
+ a: "13",
+ h: "count"
+},
+{
+ q: "THE LAST DIGIT OF π.",
+ a: "none",
+ h: "infinite"
+},
+{
+ q: "WRITE NOTHING.",
+ a: "",
+ h: "silence"
+},
+{
+ q: "WHAT IS ALWAYS COMING BUT NEVER ARRIVES?",
+ a: "tomorrow",
+ h: "time"
+},
+{
+ q: "THE SUM OF ALL PREVIOUS NUMERIC ANSWERS.",
+ a: "86",
+ h: "memory"
+},
+{
+ q: "SAY THE NAME OF THE ONE WHO ENDURED.",
+ a: "me",
+ h: "you"
+}
+];
+
+let i = 0;
+
+const stageEl = document.getElementById("stage");
+const hintEl = document.getElementById("hint");
+const input = document.getElementById("answer");
+
+stageEl.textContent = stages[i].q;
+hintEl.textContent = stages[i].h;
+
+input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        if (input.value.trim().toLowerCase() === stages[i].a) {
+            i++;
+            if (i >= stages.length) {
+                stageEl.textContent = "☩ ASCENSION COMPLETE ☩";
+                hintEl.textContent = "0744484188618072634918380227842498567723";
+                input.remove();
+                return;
+            }
+            stageEl.classList.remove("fade");
+            void stageEl.offsetWidth;
+            stageEl.classList.add("fade");
+            stageEl.textContent = stages[i].q;
+            hintEl.textContent = stages[i].h;
+            input.value = "";
+        } else {
+            document.body.classList.add("flicker");
+            setTimeout(() => document.body.classList.remove("flicker"), 300);
+        }
+    }
+});
+
+/* hidden stage clue */ console.log("veil")
+</script>
+</body>
+</html>
+	
